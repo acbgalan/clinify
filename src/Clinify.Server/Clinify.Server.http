@@ -1,0 +1,6 @@
+@Clinify.Server_HostAddress = http://localhost:5032
+
+GET {{Clinify.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
