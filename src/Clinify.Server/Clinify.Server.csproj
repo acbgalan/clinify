@@ -10,4 +10,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Clinify.Data\Clinify.Data.csproj" />
+    <ProjectReference Include="..\Clinify.Shared\Clinify.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
