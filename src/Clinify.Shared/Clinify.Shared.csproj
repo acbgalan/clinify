@@ -6,4 +6,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Doctor\Input\" />
+    <Folder Include="Doctor\Query\" />
+    <Folder Include="Doctor\Output\" />
+    <Folder Include="Patient\Query\" />
+    <Folder Include="Patient\Ouput\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+  </ItemGroup>
+
 </Project>
