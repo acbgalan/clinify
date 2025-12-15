@@ -16,6 +16,5 @@ namespace Clinify.Data.Repositories
         void Delete(T entity);
         bool Exits(Guid id);
         int Save();
-
     }
 }
