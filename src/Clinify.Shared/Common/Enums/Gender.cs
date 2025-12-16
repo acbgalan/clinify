@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Clinify.Data.Enums
+namespace Clinify.Shared.Common.Enums
 {
     public enum Gender
     {
