@@ -1,5 +1,7 @@
 using Clinify.Data.Context;
 using Clinify.Data.Repositories;
+using Clinify.Shared.Patient.Input;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationContext")));
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreatePatientRequest>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
