@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Clinify.Data.Entities;
 using Clinify.Shared.Patient.Input;
+using Clinify.Shared.Patient.Ouput;
 
 namespace Clinify.Server.Mapper
 {
@@ -14,6 +15,7 @@ namespace Clinify.Server.Mapper
         private void PatientMapping()
         {
             CreateMap<CreatePatientRequest, Patient>();
+            CreateMap<Patient, PatientResponse>();
         }
     }
 }
