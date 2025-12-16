@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Clinify.Shared.Common.Enums;
+using Medo;
 
 namespace Clinify.Data.Entities
 {
     public class Patient
     {
-        public Guid Id { get; set; } 
+        public Guid Id { get; set; } = Uuid7.NewUuid7();
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public DateOnly BirthDate { get; set; }
