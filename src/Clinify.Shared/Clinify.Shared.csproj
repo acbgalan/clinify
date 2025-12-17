@@ -11,7 +11,6 @@
     <Folder Include="Doctor\Query\" />
     <Folder Include="Doctor\Output\" />
     <Folder Include="Patient\Query\" />
-    <Folder Include="Patient\Ouput\" />
   </ItemGroup>
 
   <ItemGroup>

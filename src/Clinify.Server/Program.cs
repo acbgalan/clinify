@@ -1,6 +1,7 @@
 using Clinify.Data.Context;
 using Clinify.Data.Repositories;
 using Clinify.Server.Mapper;
+using Clinify.Server.Services.PatientService;
 using Clinify.Shared.Patient.Input;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationContext")));
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.LicenseKey = builder.Configuration["AutoMapper:LicenseKey"];
