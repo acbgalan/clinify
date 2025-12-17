@@ -8,7 +8,8 @@ namespace Clinify.Server.Services.PatientService
 {
     public interface IPatientService
     {
-        Task<ServiceResult<PatientResponse>> GetPatient(Guid id);
+        Task<ServiceResult<PatientResponse>> GetPatientAsync(Guid id);
+        Task<ServiceResult<List<PatientResponse>>> GetPatientsAsync();
         Task<ServiceResult<Patient>> CreatePatientAsync(CreatePatientRequest createPatientRequest);
     }
 }

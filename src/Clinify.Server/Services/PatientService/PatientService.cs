@@ -20,7 +20,7 @@ namespace Clinify.Server.Services.PatientService
             _mapper = mapper;
         }
 
-        public async Task<ServiceResult<PatientResponse>> GetPatient(Guid id)
+        public async Task<ServiceResult<PatientResponse>> GetPatientAsync(Guid id)
         {
             ServiceResult<PatientResponse> serviceResult;
 
@@ -50,6 +50,37 @@ namespace Clinify.Server.Services.PatientService
             catch (Exception ex)
             {
                 serviceResult = new ServiceResult<PatientResponse>()
+                {
+                    Data = null,
+                    Success = false,
+                    Message = $"Unexpected error: {ex.Message}",
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+
+            return serviceResult;
+        }
+
+        public async Task<ServiceResult<List<PatientResponse>>> GetPatientsAsync()
+        {
+            ServiceResult<List<PatientResponse>> serviceResult;
+
+            try
+            {
+                var patients = await _patientRepository.GetAllAsync();
+                var patiensResponse = _mapper.Map<List<PatientResponse>>(patients);
+
+                serviceResult = new ServiceResult<List<PatientResponse>>()
+                {
+                    Data = patiensResponse,
+                    Success = true,
+                    Message = "Patients retrieved",
+                    StatusCode = StatusCodes.Status200OK
+                };
+            }
+            catch (Exception ex)
+            {
+                serviceResult = new ServiceResult<List<PatientResponse>>()
                 {
                     Data = null,
                     Success = false,
@@ -104,7 +135,6 @@ namespace Clinify.Server.Services.PatientService
 
             return serviceResult;
         }
-
 
     }
 }

@@ -30,7 +30,22 @@ namespace Clinify.Server.Controllers
         public async Task<ActionResult<PatientResponse>> GetPatient(Guid id)
         {
             //TODO: Puede llegar un Id null, revisar?
-            var serviceResult = await _patientService.GetPatient(id);
+            var serviceResult = await _patientService.GetPatientAsync(id);
+
+            if (!serviceResult.Success)
+            {
+                return StatusCode(serviceResult.StatusCode, serviceResult.Message);
+            }
+
+            return Ok(serviceResult.Data);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<PatientResponse>>> GetAllPatients()
+        {
+            var serviceResult = await _patientService.GetPatientsAsync();
 
             if (!serviceResult.Success)
             {
