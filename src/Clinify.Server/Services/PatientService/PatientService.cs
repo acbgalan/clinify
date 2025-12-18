@@ -22,119 +22,200 @@ namespace Clinify.Server.Services.PatientService
 
         public async Task<ServiceResult<PatientResponse>> GetPatientAsync(Guid id)
         {
-            ServiceResult<PatientResponse> serviceResult;
-
             try
             {
                 var patient = await _patientRepository.GetAsync(id);
                 var patientResponse = patient != null ? _mapper.Map<PatientResponse>(patient) : null;
 
-                serviceResult = new ServiceResult<PatientResponse>()
+                if (patient != null)
                 {
-                    Data = patientResponse,
-                    Success = patient != null,
-                    Message = patient != null ? "Patient retrieved" : "Patient not found",
-                    StatusCode = patient != null ? StatusCodes.Status200OK : StatusCodes.Status404NotFound
-                };
+                    return SuccessResult<PatientResponse>(patientResponse!, "Patient retrieved successfully", StatusCodes.Status200OK);
+                }
+                else
+                {
+                    return FailureResult<PatientResponse>("Patient not found", StatusCodes.Status404NotFound);
+                }
             }
             catch (DbUpdateException ex)
             {
-                serviceResult = new ServiceResult<PatientResponse>()
-                {
-                    Data = null,
-                    Success = false,
-                    Message = $"Database error: {ex.Message}",
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
+                return HandleDbUpdateException<PatientResponse>(ex);
             }
             catch (Exception ex)
             {
-                serviceResult = new ServiceResult<PatientResponse>()
-                {
-                    Data = null,
-                    Success = false,
-                    Message = $"Unexpected error: {ex.Message}",
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
+                return HandleGeneralException<PatientResponse>(ex);
             }
-
-            return serviceResult;
         }
 
         public async Task<ServiceResult<List<PatientResponse>>> GetPatientsAsync()
         {
-            ServiceResult<List<PatientResponse>> serviceResult;
-
             try
             {
                 var patients = await _patientRepository.GetAllAsync();
                 var patiensResponse = _mapper.Map<List<PatientResponse>>(patients);
-
-                serviceResult = new ServiceResult<List<PatientResponse>>()
-                {
-                    Data = patiensResponse,
-                    Success = true,
-                    Message = "Patients retrieved",
-                    StatusCode = StatusCodes.Status200OK
-                };
+                return SuccessResult<List<PatientResponse>>(patiensResponse, "Patients retrieved successfully", StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
-                serviceResult = new ServiceResult<List<PatientResponse>>()
-                {
-                    Data = null,
-                    Success = false,
-                    Message = $"Unexpected error: {ex.Message}",
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
+                return HandleGeneralException<List<PatientResponse>>(ex);
             }
-
-            return serviceResult;
         }
 
-        public async Task<ServiceResult<Patient>> CreatePatientAsync(CreatePatientRequest createPatientRequest)
+        public async Task<ServiceResult<PatientResponse>> CreatePatientAsync(CreatePatientRequest createPatientRequest)
         {
-            ServiceResult<Patient> serviceResult;
-
             try
             {
-                //TODO: Recuperar usuario y validar que se ha podido recuperar. Usuario necesario para asignar a CreatedBy
+                //TODO: Retrieve user and validate that recovery was successful. User required to assign to CreatedBy
                 var patient = _mapper.Map<Patient>(createPatientRequest);
-                //TODO: CreatedBy debe tener usuario
+                //TODO: Patients must have a user assigned in CreatedAt
                 await _patientRepository.AddAsync(patient);
                 int saveResult = await _patientRepository.SaveAsync();
 
-                serviceResult = new ServiceResult<Patient>()
+                if (saveResult > 0)
                 {
-                    Data = patient,
-                    Success = saveResult > 0,
-                    Message = saveResult > 0 ? "Patient created successfully" : "Unexpected value when saving",
-                    StatusCode = saveResult > 0 ? StatusCodes.Status201Created : StatusCodes.Status500InternalServerError
-                };
+                    var patientResponse = _mapper.Map<PatientResponse>(patient);
+                    return SuccessResult<PatientResponse>(patientResponse, "Patient created successfully", StatusCodes.Status201Created);
+                }
+                else
+                {
+                    return FailureResult<PatientResponse>("Unexpected value when creating a new patient", StatusCodes.Status500InternalServerError);
+                }
             }
             catch (DbUpdateException ex)
             {
-                serviceResult = new ServiceResult<Patient>()
-                {
-                    Data = null,
-                    Success = false,
-                    Message = $"Database error: {ex.Message}",
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
+                return HandleDbUpdateException<PatientResponse>(ex);
             }
             catch (Exception ex)
             {
-                serviceResult = new ServiceResult<Patient>()
-                {
-                    Data = null,
-                    Success = false,
-                    Message = $"Unexpected error: {ex.Message}",
-                    StatusCode = StatusCodes.Status500InternalServerError
-                };
+                return HandleGeneralException<PatientResponse>(ex);
             }
-
-            return serviceResult;
         }
 
+        public async Task<ServiceResult> UpdatePatient(UpdatePatientRequest updatePatientRequest)
+        {
+            try
+            {
+                var patient = _mapper.Map<Patient>(updatePatientRequest);
+                await _patientRepository.UpdateAsync(patient);
+                int saveResult = await _patientRepository.SaveAsync();
+
+                if (saveResult > 0)
+                {
+                    return SuccessResult("Patient updated successfully", StatusCodes.Status204NoContent);
+                }
+                else
+                {
+                    return FailureResult("Unexpected value when updating a new patient", StatusCodes.Status500InternalServerError);
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                return HandleDbUpdateException(ex);
+            }
+            catch (Exception ex)
+            {
+                return HandleGeneralException(ex);
+            }
+        }
+
+        public async Task<ServiceResult> DeletePatient(Guid id)
+        {
+            try
+            {
+                var patient = await _patientRepository.GetAsync(id);
+
+                if (patient == null)
+                {
+                    return SuccessResult("Patient not found", StatusCodes.Status404NotFound);
+                }
+                else
+                {
+                    await _patientRepository.DeleteAsync(patient);
+                    int saveResult = await _patientRepository.SaveAsync();
+
+                    if (saveResult > 0)
+                    {
+                        return SuccessResult("Patient removed successfully", StatusCodes.Status204NoContent);
+                    }
+                    else
+                    {
+                        return FailureResult("Unexpected value when deleting patient", StatusCodes.Status500InternalServerError);
+                    }
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                return HandleDbUpdateException(ex);
+            }
+            catch (Exception ex)
+            {
+                return HandleGeneralException(ex);
+            }
+        }
+
+
+        #region Auxiliary methods
+        private ServiceResult<T> SuccessResult<T>(T data, string message, int statusCode)
+        {
+            return new ServiceResult<T>
+            {
+                Data = data,
+                Success = true,
+                Message = message,
+                StatusCode = statusCode
+            };
+        }
+
+        private ServiceResult SuccessResult(string message, int statusCode)
+        {
+            return new ServiceResult
+            {
+                Success = true,
+                Message = message,
+                StatusCode = statusCode
+            };
+        }
+
+        private ServiceResult<T> FailureResult<T>(string message, int statusCode, T? data = default)
+        {
+            return new ServiceResult<T>
+            {
+                Data = data,
+                Success = false,
+                Message = message,
+                StatusCode = statusCode
+            };
+        }
+
+        private ServiceResult FailureResult(string message, int statusCode)
+        {
+            return new ServiceResult
+            {
+                Success = false,
+                Message = message,
+                StatusCode = statusCode
+            };
+        }
+
+        private ServiceResult<T> HandleDbUpdateException<T>(DbUpdateException ex)
+        {
+            return FailureResult<T>($"Database error: {ex.Message}", StatusCodes.Status500InternalServerError);
+        }
+
+        private ServiceResult HandleDbUpdateException(DbUpdateException ex)
+        {
+            return FailureResult($"Database error: {ex.Message}", StatusCodes.Status500InternalServerError);
+        }
+
+        private ServiceResult<T> HandleGeneralException<T>(Exception ex)
+        {
+            return FailureResult<T>($"Unexpected error: {ex.Message}", StatusCodes.Status500InternalServerError);
+        }
+
+        private ServiceResult HandleGeneralException(Exception ex)
+        {
+            return FailureResult($"Unexpected error: {ex.Message}", StatusCodes.Status500InternalServerError);
+        }
+
+        #endregion
     }
 }

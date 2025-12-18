@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Clinify.Shared.Common
 {
-    public class ServiceResult<T>
+    public class ServiceResult
     {
-        public T? Data { get; set; }
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
         public int StatusCode { get; set; }

@@ -14,12 +14,10 @@ namespace Clinify.Server.Controllers
     [ApiController]
     public class PatientController : ControllerBase
     {
-        private readonly IValidator<CreatePatientRequest> _validator;
         private readonly IPatientService _patientService;
 
-        public PatientController(IValidator<CreatePatientRequest> validator, IPatientService patientService)
+        public PatientController(IPatientService patientService)
         {
-            _validator = validator;
             _patientService = patientService;
         }
 
@@ -29,7 +27,6 @@ namespace Clinify.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PatientResponse>> GetPatient(Guid id)
         {
-            //TODO: Puede llegar un Id null, revisar?
             var serviceResult = await _patientService.GetPatientAsync(id);
 
             if (!serviceResult.Success)
@@ -61,14 +58,6 @@ namespace Clinify.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CreatePatient([FromBody] CreatePatientRequest createPatientRequest)
         {
-            //TODO: Si es null el validator falla?
-            var validationResult = await _validator.ValidateAsync(createPatientRequest);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.ToDictionary());
-            }
-
             var serviceResult = await _patientService.CreatePatientAsync(createPatientRequest);
 
             if (!serviceResult.Success)
@@ -79,6 +68,40 @@ namespace Clinify.Server.Controllers
             return CreatedAtRoute("GetPatient", new { id = serviceResult.Data!.Id }, serviceResult.Data);
         }
 
+        [HttpPut("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdatePatient(Guid id, UpdatePatientRequest updatePatientRequest)
+        {
+            if (id != updatePatientRequest.Id)
+            {
+                return BadRequest("Id mismatch");
+            }
 
+            var serviceResult = await _patientService.UpdatePatient(updatePatientRequest);
+
+            if (!serviceResult.Success)
+            {
+                return StatusCode(serviceResult.StatusCode, serviceResult.Message);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeletePatient(Guid id)
+        {
+            var serviceResult = await _patientService.DeletePatient(id);
+
+            if (!serviceResult.Success)
+            {
+                return StatusCode(serviceResult.StatusCode, serviceResult.Message);
+            }
+
+            return NoContent();
+        }
     }
 }

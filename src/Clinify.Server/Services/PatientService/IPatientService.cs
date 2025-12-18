@@ -10,6 +10,8 @@ namespace Clinify.Server.Services.PatientService
     {
         Task<ServiceResult<PatientResponse>> GetPatientAsync(Guid id);
         Task<ServiceResult<List<PatientResponse>>> GetPatientsAsync();
-        Task<ServiceResult<Patient>> CreatePatientAsync(CreatePatientRequest createPatientRequest);
+        Task<ServiceResult<PatientResponse>> CreatePatientAsync(CreatePatientRequest createPatientRequest);
+        Task<ServiceResult> UpdatePatient(UpdatePatientRequest updatePatientRequest);
+        Task<ServiceResult> DeletePatient(Guid id);
     }
 }
