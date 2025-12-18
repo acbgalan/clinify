@@ -14,12 +14,17 @@ namespace Clinify.Server.Controllers
     [ApiController]
     public class PatientController : ControllerBase
     {
-        private readonly IValidator<CreatePatientRequest> _validator;
+        private readonly IValidator<CreatePatientRequest> _createValidator;
+        private readonly IValidator<UpdatePatientRequest> _updateValidator;
         private readonly IPatientService _patientService;
 
-        public PatientController(IValidator<CreatePatientRequest> validator, IPatientService patientService)
+        public PatientController(
+            IValidator<CreatePatientRequest> createValidator,
+            IValidator<UpdatePatientRequest> updateValidator,
+            IPatientService patientService)
         {
-            _validator = validator;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
             _patientService = patientService;
         }
 
@@ -60,8 +65,7 @@ namespace Clinify.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CreatePatient([FromBody] CreatePatientRequest createPatientRequest)
         {
-            //TODO: Si es null el validator falla?
-            var validationResult = await _validator.ValidateAsync(createPatientRequest);
+            var validationResult = await _createValidator.ValidateAsync(createPatientRequest);
 
             if (!validationResult.IsValid)
             {
@@ -84,7 +88,12 @@ namespace Clinify.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdatePatient(Guid id, UpdatePatientRequest updatePatientRequest)
         {
-            //TODO: Validator
+            var validationResult = _updateValidator.Validate(updatePatientRequest);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.ToDictionary());
+            }
 
             if (id != updatePatientRequest.Id)
             {
@@ -116,8 +125,5 @@ namespace Clinify.Server.Controllers
 
             return NoContent();
         }
-
-
-
     }
 }

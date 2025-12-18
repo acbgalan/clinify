@@ -8,9 +8,9 @@ using FluentValidation;
 
 namespace Clinify.Shared.Patient.Input
 {
-    public class CreatePatientRequestValidator : AbstractValidator<CreatePatientRequest>
+    public class UpdatePatientRequestValidator : AbstractValidator<UpdatePatientRequest>
     {
-        public CreatePatientRequestValidator()
+        public UpdatePatientRequestValidator()
         {
             RuleFor(x => x.FirstName)
                 .NotEmpty().WithMessage("The name is required and cannot be empty.")

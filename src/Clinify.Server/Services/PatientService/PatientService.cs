@@ -64,9 +64,9 @@ namespace Clinify.Server.Services.PatientService
         {
             try
             {
-                //TODO: Recuperar usuario y validar que se ha podido recuperar. Usuario necesario para asignar a CreatedBy
+                //TODO: Retrieve user and validate that recovery was successful. User required to assign to CreatedBy
                 var patient = _mapper.Map<Patient>(createPatientRequest);
-                //TODO: CreatedBy debe tener usuario
+                //TODO: Patients must have a user assigned in CreatedAt
                 await _patientRepository.AddAsync(patient);
                 int saveResult = await _patientRepository.SaveAsync();
 
