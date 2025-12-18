@@ -4,6 +4,7 @@ using Clinify.Server.Mapper;
 using Clinify.Server.Services.PatientService;
 using Clinify.Shared.Patient.Input;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,8 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.LicenseKey = builder.Configuration["AutoMapper:LicenseKey"];
 }, typeof(AutoMapperProfiles));
+
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreatePatientRequest>();
 
 

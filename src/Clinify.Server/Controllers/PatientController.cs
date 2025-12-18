@@ -14,17 +14,10 @@ namespace Clinify.Server.Controllers
     [ApiController]
     public class PatientController : ControllerBase
     {
-        private readonly IValidator<CreatePatientRequest> _createValidator;
-        private readonly IValidator<UpdatePatientRequest> _updateValidator;
         private readonly IPatientService _patientService;
 
-        public PatientController(
-            IValidator<CreatePatientRequest> createValidator,
-            IValidator<UpdatePatientRequest> updateValidator,
-            IPatientService patientService)
+        public PatientController(IPatientService patientService)
         {
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
             _patientService = patientService;
         }
 
@@ -65,13 +58,6 @@ namespace Clinify.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> CreatePatient([FromBody] CreatePatientRequest createPatientRequest)
         {
-            var validationResult = await _createValidator.ValidateAsync(createPatientRequest);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.ToDictionary());
-            }
-
             var serviceResult = await _patientService.CreatePatientAsync(createPatientRequest);
 
             if (!serviceResult.Success)
@@ -82,19 +68,12 @@ namespace Clinify.Server.Controllers
             return CreatedAtRoute("GetPatient", new { id = serviceResult.Data!.Id }, serviceResult.Data);
         }
 
-        [HttpPost("{id:guid}")]
+        [HttpPut("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> UpdatePatient(Guid id, UpdatePatientRequest updatePatientRequest)
         {
-            var validationResult = _updateValidator.Validate(updatePatientRequest);
-
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.ToDictionary());
-            }
-
             if (id != updatePatientRequest.Id)
             {
                 return BadRequest("Id mismatch");
@@ -109,7 +88,6 @@ namespace Clinify.Server.Controllers
 
             return NoContent();
         }
-
 
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
