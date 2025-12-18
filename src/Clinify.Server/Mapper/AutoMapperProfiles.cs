@@ -15,7 +15,8 @@ namespace Clinify.Server.Mapper
         private void PatientMapping()
         {
             CreateMap<CreatePatientRequest, Patient>();
-            CreateMap<Patient, PatientResponse>();
+            CreateMap<Patient, PatientResponse>().ReverseMap();
+            CreateMap<UpdatePatientRequest, Patient>();
         }
     }
 }

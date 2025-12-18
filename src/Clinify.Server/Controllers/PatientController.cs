@@ -29,7 +29,6 @@ namespace Clinify.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PatientResponse>> GetPatient(Guid id)
         {
-            //TODO: Puede llegar un Id null, revisar?
             var serviceResult = await _patientService.GetPatientAsync(id);
 
             if (!serviceResult.Success)
@@ -78,6 +77,46 @@ namespace Clinify.Server.Controllers
 
             return CreatedAtRoute("GetPatient", new { id = serviceResult.Data!.Id }, serviceResult.Data);
         }
+
+        [HttpPost("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> UpdatePatient(Guid id, UpdatePatientRequest updatePatientRequest)
+        {
+            //TODO: Validator
+
+            if (id != updatePatientRequest.Id)
+            {
+                return BadRequest("Id mismatch");
+            }
+
+            var serviceResult = await _patientService.UpdatePatient(updatePatientRequest);
+
+            if (!serviceResult.Success)
+            {
+                return StatusCode(serviceResult.StatusCode, serviceResult.Message);
+            }
+
+            return NoContent();
+        }
+
+
+        [HttpDelete("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeletePatient(Guid id)
+        {
+            var serviceResult = await _patientService.DeletePatient(id);
+
+            if (!serviceResult.Success)
+            {
+                return StatusCode(serviceResult.StatusCode, serviceResult.Message);
+            }
+
+            return NoContent();
+        }
+
 
 
     }
