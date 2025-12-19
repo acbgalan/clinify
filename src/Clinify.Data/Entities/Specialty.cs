@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Clinify.Data.Entities
 {
-    internal class Specialty
+    public class Specialty
     {
+        public int Id { get; set; }
+        public required string Name { get; set; }
     }
 }
