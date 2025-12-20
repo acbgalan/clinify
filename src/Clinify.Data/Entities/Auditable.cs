@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 
 namespace Clinify.Data.Entities
 {
-    public class Specialty
+    internal class Auditable
     {
-        public int Id { get; set; }
-        public required string Name { get; set; }
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? UpdatedAt { get; set; }
         public Guid CreatedBy { get; set; }
         public Guid? UpdatedBy { get; set; }
-
-        public List<Doctor> Doctors { get; set; } = new List<Doctor>();
     }
 }

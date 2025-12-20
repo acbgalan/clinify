@@ -1,15 +1,16 @@
-﻿using Clinify.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Clinify.Data.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 namespace Clinify.Data.Configurations
 {
-    public class PatientConfiguration : IEntityTypeConfiguration<Patient>
+    internal class PatientConfiguration : IEntityTypeConfiguration<Patient>
     {
         public void Configure(EntityTypeBuilder<Patient> builder)
         {
