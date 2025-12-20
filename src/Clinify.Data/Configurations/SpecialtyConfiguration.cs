@@ -33,11 +33,6 @@ namespace Clinify.Data.Configurations
 
             builder.Property(x => x.UpdatedBy)
                 .IsRequired(false);
-
-            builder.HasMany(x => x.Doctors)
-                .WithOne(y => y.Specialty)
-                .HasForeignKey(y => y.SpecialtyId)
-                .IsRequired();
         }
     }
 }
