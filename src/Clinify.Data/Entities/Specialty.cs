@@ -15,6 +15,6 @@ namespace Clinify.Data.Entities
         public Guid CreatedBy { get; set; }
         public Guid? UpdatedBy { get; set; }
 
-        public List<Doctor> Doctors { get; set; } = new List<Doctor>();
+        public ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
     }
 }
